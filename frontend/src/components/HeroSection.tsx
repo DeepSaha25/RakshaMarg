@@ -1,20 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import docImg from '../assets/doc.png';
+import pilotImg from '../assets/pilot.png';
+import soldierImg from '../assets/soldier.png';
 
 const HeroSection = () => {
+  const images = [docImg, pilotImg, soldierImg];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       
       <div className="container relative z-10 px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Logo/Shield */}
+          {/* Logo/Image Carousel */}
           <div className="mb-8 inline-flex items-center justify-center animate-scale-in">
             <div className="relative">
               <div className="absolute inset-0 bg-secondary/20 rounded-full blur-2xl animate-shield" />
               <div className="relative bg-gradient-to-br from-primary to-navy-dark p-6 rounded-2xl shadow-elevated">
-                <Shield className="w-16 h-16 text-primary-foreground" />
+                <img 
+                  key={currentImageIndex}
+                  src={images[currentImageIndex]} 
+                  alt="Role Icon" 
+                  className="w-23 h-20 object-contain animate-fade-in"
+                />
               </div>
             </div>
           </div>
