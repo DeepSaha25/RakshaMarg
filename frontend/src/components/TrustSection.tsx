@@ -2,6 +2,7 @@ import React from 'react';
 import { Shield, Heart, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png'; // Import the logo
 
 const TrustSection = () => {
   return (
@@ -29,7 +30,8 @@ const TrustSection = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-secondary/30 rounded-full blur-xl animate-pulse-slow" />
               <div className="relative bg-secondary/20 backdrop-blur-sm p-5 rounded-full border border-secondary/30">
-                <Shield className="w-12 h-12" />
+                {/* Replaced Shield icon with Logo */}
+                <img src={logo} alt="RakshaMarg Logo" className="w-12 h-12 object-contain" />
               </div>
             </div>
           </div>
