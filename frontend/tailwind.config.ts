@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -19,7 +20,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Space Grotesk", "sans-serif"], 
+        display: ["Space Grotesk", "sans-serif"],
         sans: ["Inter", "sans-serif"],
       },
       colors: {
@@ -56,12 +57,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        
+
         brand: {
-          dark: "#0b0614",      
-          purple: "#8a2cff",    
-          teal: "#2dd4bf",      
-          light: "#eae7f5",     
+          dark: "#0b0614",
+          purple: "#8a2cff",
+          teal: "#2dd4bf",
+          light: "#eae7f5",
         },
       },
       keyframes: {
@@ -80,5 +81,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindAnimate],
 } satisfies Config;

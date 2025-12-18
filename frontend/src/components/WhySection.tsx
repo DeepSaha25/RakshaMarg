@@ -8,7 +8,7 @@ const features = [
     icon: Shield,
     title: 'Guardian AI',
     description: 'Predictive algorithms analyze historical data to flag unsafe zones before you enter them.',
-    className: "md:col-span-2 md:row-span-1 bg-gradient-to-br from-brand-purple/20 to-brand-dark border-brand-purple/20", 
+    className: "md:col-span-2 md:row-span-1 bg-gradient-to-br from-brand-purple/20 to-brand-dark border-brand-purple/20",
     iconClass: "text-brand-purple"
   },
   {
@@ -22,20 +22,28 @@ const features = [
     icon: Target,
     title: 'Precision Data',
     description: 'Street-level lighting and crowd density visualization.',
-    
-    className: "md:col-span-1 md:row-span-1 bg-brand-teal/10 border-brand-teal/20", 
+
+    className: "md:col-span-1 md:row-span-1 bg-brand-teal/10 border-brand-teal/20",
     iconClass: "text-brand-teal"
   },
   {
     icon: Users,
     title: 'Crowd Source',
     description: 'Community-verified safety reports ensure you never walk alone.',
-    className: "md:col-span-2 md:row-span-1 bg-brand-dark border-white/5",
+    className: "md:col-span-2 lg:col-span-2 md:row-span-1 bg-brand-dark border-white/5",
     iconClass: "text-white"
   },
 ];
 
-const BentoCard = ({ feature, index }: { feature: any, index: number }) => (
+interface Feature {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  className: string;
+  iconClass: string;
+}
+
+const BentoCard = ({ feature, index }: { feature: Feature, index: number }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.9 }}
     whileInView={{ opacity: 1, scale: 1 }}
@@ -54,8 +62,8 @@ const BentoCard = ({ feature, index }: { feature: any, index: number }) => (
       <h3 className="font-display text-xl font-bold mb-2 text-white">{feature.title}</h3>
       <p className="text-white/60 text-sm leading-relaxed">{feature.description}</p>
     </div>
-    
-    {}
+
+    { }
     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
   </motion.div>
 );
@@ -69,7 +77,7 @@ const WhySection = () => {
           <p className="text-white/50 text-lg">Built for the modern night.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[250px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[250px]">
           {features.map((feature, index) => (
             <BentoCard key={index} feature={feature} index={index} />
           ))}

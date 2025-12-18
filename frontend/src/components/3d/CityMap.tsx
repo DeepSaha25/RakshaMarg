@@ -56,10 +56,13 @@ const ShieldMaterial = shaderMaterial(
 
 extend({ ShieldMaterial });
 
+// Fix for: ES2015 module syntax is preferred over namespaces
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
-      shieldMaterial: any; // Using any to bypass strict type checking for the custom shader material props
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      shieldMaterial: any;
     }
   }
 }
