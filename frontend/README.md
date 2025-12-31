@@ -1,8 +1,7 @@
 # RakshaMarg
 
 > **Navigate the Night with Intelligence.**
-
-![RakshaMarg Banner](frontend/public/logo.png)
+[RakshaMarg Banner](frontend/public/logo.png)
 
 ## 🛡️ Vision
 
