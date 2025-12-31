@@ -119,6 +119,11 @@ const CheckRoute = () => {
         (error) => {
           console.error("Error getting location:", error);
           // Don't show error immediately on load, just log it
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 20000,
+          maximumAge: 0
         }
       );
     }
@@ -371,7 +376,7 @@ const CheckRoute = () => {
           alert(`Emergency alert sent to ${trustedContacts.length} contacts! Calling Police...`);
           window.location.href = 'tel:100';
         }
-      });
+      }, (error) => console.error("SOS location error:", error), { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
     }
   };
 
@@ -414,7 +419,7 @@ const CheckRoute = () => {
           } catch (error) {
             console.error('Tracking error:', error);
           }
-        });
+        }, (error) => console.error("Tracking location error:", error), { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
       }
     }, 10000);
     setTrackingInterval(interval);

@@ -154,6 +154,11 @@ const SafetyMap: React.FC<SafetyMapProps> = ({
                 },
                 () => {
                     console.log("Error fetching location");
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 20000,
+                    maximumAge: 0
                 }
             );
         }
