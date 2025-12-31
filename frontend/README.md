@@ -2,7 +2,7 @@
 
 > **Navigate the Night with Intelligence.**
 
-![RakshaMarg Banner](../assets/logo.png)
+![RakshaMarg Banner](frontend/public/logo.png)
 
 ## 🛡️ Vision
 
