@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { MapPin, Navigation, Search, Shield, AlertTriangle, CheckCircle, Info, Share2, Lightbulb } from 'lucide-react';
+import { MapPin, Navigation, Search, Shield, AlertTriangle, CheckCircle, Info, Share2, Lightbulb, Clock, Calendar, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import mapImage from '@/assets/map.png';
+import { analyzeRouteSafety, getIncidentDetails, RouteInfo, IncidentDetail } from '@/services/navigation';
 
 const safetyTips = [
   "Share your live location with a trusted contact.",
@@ -22,23 +24,79 @@ const CheckRoute = () => {
   const [toLocation, setToLocation] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [routes, setRoutes] = useState<RouteInfo[]>([]);
+  const [safestRouteName, setSafestRouteName] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCheckRoute = () => {
+  // Incident Details Modal State
+  const [selectedRoute, setSelectedRoute] = useState<RouteInfo | null>(null);
+  const [incidents, setIncidents] = useState<IncidentDetail[]>([]);
+  const [loadingIncidents, setLoadingIncidents] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [displayedIncidentCount, setDisplayedIncidentCount] = useState(0);
+
+  const handleCheckRoute = async () => {
     if (!fromLocation || !toLocation) return;
 
     setIsAnalyzing(true);
+    setError(null);
+    setShowResults(false);
 
-    // Simulate analysis delay
-    setTimeout(() => {
-      setIsAnalyzing(false);
+    try {
+      const data = await analyzeRouteSafety(fromLocation, toLocation);
+      setRoutes(data.routes);
+      setSafestRouteName(data.safest_route);
       setShowResults(true);
-    }, 2000);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to analyze route safety. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
-  const resetSearch = () => {
-    setFromLocation('');
-    setToLocation('');
-    setShowResults(false);
+  const handleViewDetails = async (route: RouteInfo) => {
+    setSelectedRoute(route);
+    setIncidents([]);
+    setDisplayedIncidentCount(0);
+    setIsDialogOpen(true);
+
+    // Load first batch of incidents
+    await loadMoreIncidents(route, 0);
+  };
+
+  const loadMoreIncidents = async (route: RouteInfo, currentCount: number) => {
+    if (!route.incident_ids || route.incident_ids.length === 0) return;
+
+    setLoadingIncidents(true);
+    const nextIds = route.incident_ids.slice(currentCount, currentCount + 10);
+
+    if (nextIds.length === 0) {
+      setLoadingIncidents(false);
+      return;
+    }
+
+    try {
+      const newIncidents = await getIncidentDetails(nextIds);
+      setIncidents(prev => [...prev, ...newIncidents]);
+      setDisplayedIncidentCount(currentCount + nextIds.length);
+    } catch (err) {
+      console.error('Failed to load incidents', err);
+    } finally {
+      setLoadingIncidents(false);
+    }
+  };
+
+  const getSafetyScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-500';
+    if (score >= 60) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+
+  const getSafetyScoreBg = (score: number) => {
+    if (score >= 80) return 'border-green-500/50 bg-green-500/10';
+    if (score >= 60) return 'border-yellow-500/50 bg-yellow-500/10';
+    return 'border-red-500/50 bg-red-500/10';
   };
 
   return (
@@ -169,108 +227,75 @@ const CheckRoute = () => {
                       <span>•</span>
                       <span>No live tracking stored</span>
                     </div>
+                    {error && (
+                      <div className="mt-4 text-center text-red-400 bg-red-500/10 p-3 rounded-xl border border-red-500/20">
+                        {error}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </motion.div>
           </section>
 
-          {/* Results Section (Restored Map Layout) */}
-          {showResults && (
+          {/* Results Section */}
+          {showResults && routes.length > 0 && (
             <section className="container px-4 mb-16 animate-fade-in scroll-mt-24" id="results">
-              <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-6">
-
-                {/* Map Section (Restored) */}
-                <div className="lg:col-span-3 bg-white/5 rounded-3xl overflow-hidden border border-white/10 shadow-lg flex flex-col relative group">
-                  <div className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-brand-teal" />
-                    <span className="text-xs font-bold text-white">Route Preview</span>
-                  </div>
-
-                  {/* Map Container */}
-                  <div className="flex-1 min-h-[400px] relative bg-black/40">
-                    <img
-                      src={mapImage}
-                      alt="Route Map"
-                      className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700"
-                    />
-
-                    {/* Overlay Route Line (Decorative) */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ filter: 'drop-shadow(0 0 4px #2dd4bf)' }}>
-                      <path d="M 150 300 Q 250 250 400 150 T 600 100" stroke="#2dd4bf" strokeWidth="4" fill="none" strokeDasharray="10 5" className="animate-[dash_20s_linear_infinite]" />
-                    </svg>
-
-                    {/* Overlay Route Info */}
-                    <div className="absolute bottom-6 left-6 right-6 bg-black/80 backdrop-blur-md rounded-xl p-4 border border-white/10 flex items-center justify-between">
-                      <div>
-                        <p className="text-white font-bold text-sm mb-0.5">{fromLocation}</p>
-                        <div className="w-0.5 h-2 bg-white/20 ml-1.5 my-0.5" />
-                        <p className="text-brand-purple font-bold text-sm">{toLocation}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-brand-teal font-bold text-lg">~25 min</p>
-                        <p className="text-white/50 text-xs">Safe Route</p>
-                      </div>
-                    </div>
-                  </div>
+              <div className="max-w-4xl mx-auto space-y-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Shield className="w-6 h-6 text-brand-teal" />
+                  <h2 className="text-2xl font-bold">Route Analysis Results</h2>
                 </div>
 
-                {/* Safety Analysis Sidebar */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Safety Score Card */}
-                  <div className="bg-white/5 rounded-3xl p-6 border border-white/10 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-10">
-                      <Shield className="w-24 h-24 text-white" />
+                {routes.map((route, index) => {
+                  const isSafest = route.route_name === safestRouteName;
+                  return (
+                    <div
+                      key={index}
+                      className={`bg-white/5 rounded-3xl p-6 border ${isSafest ? 'border-brand-teal shadow-[0_0_20px_rgba(45,212,191,0.15)]' : 'border-white/10'} relative overflow-hidden transition-all hover:bg-white/10`}
+                    >
+                      {isSafest && (
+                        <div className="absolute top-0 right-0 bg-brand-teal text-brand-dark px-4 py-1 text-xs font-bold rounded-bl-xl">
+                          SAFEST OPTION
+                        </div>
+                      )}
+
+                      <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+                        <div className="flex-1 space-y-2">
+                          <h3 className="font-bold text-lg text-white/90">{route.route_name}</h3>
+                          <div className="flex flex-wrap gap-4 text-sm text-white/60">
+                            <span className="flex items-center gap-1.5">
+                              <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                              {route.incident_count} Recent Incidents
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Shield className="w-4 h-4 text-brand-purple" />
+                              {route.bounds_analyzed} Zones Analyzed
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
+                          <div className="text-center">
+                            <div className={`text-3xl font-bold ${getSafetyScoreColor(route.safety_score)}`}>{route.safety_score}%</div>
+                            <div className="text-xs uppercase tracking-wider text-white/40 font-bold">Safety Score</div>
+                          </div>
+
+                          <Button
+                            onClick={() => handleViewDetails(route)}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className={`mt-4 inline-block px-3 py-1 rounded-full text-xs font-bold border ${getSafetyScoreBg(route.safety_score)}`}>
+                        Risk Level: {route.risk_level}
+                      </div>
                     </div>
-
-                    <h3 className="font-display text-lg font-bold text-white/80 mb-4 flex items-center gap-2">
-                      <Shield className="w-5 h-5 text-brand-purple" />
-                      Safety Analysis
-                    </h3>
-
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-16 h-16 rounded-full border-4 border-white/5 flex items-center justify-center relative">
-                        <span className="text-xl font-bold text-white">78</span>
-                        <svg className="absolute inset-0 w-full h-full -rotate-90">
-                          <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="none" className="text-yellow-500 opacity-20" />
-                          <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="none" className="text-yellow-500" strokeDasharray="175.9" strokeDashoffset={175.9 - (175.9 * 78) / 100} strokeLinecap="round" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-yellow-500">MODERATE</div>
-                        <div className="text-sm text-white/50">Caution Advised</div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                        <Info className="w-4 h-4 text-brand-teal mt-0.5 shrink-0" />
-                        <p className="text-sm text-white/70">Route has good street lighting (85%).</p>
-                      </div>
-                      <div className="flex gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                        <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
-                        <p className="text-sm text-white/70">Low crowd density on 2nd Avenue.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="grid gap-3">
-                    <Button className="w-full h-14 bg-white text-brand-dark hover:bg-white/90 rounded-2xl text-base font-bold shadow-lg">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-5 h-5" />
-                        <span>View Safer Alternative</span>
-                      </div>
-                    </Button>
-
-                    <Button variant="outline" className="w-full h-14 border-white/10 text-white hover:bg-white/10 rounded-2xl text-base font-bold">
-                      <div className="flex items-center gap-2">
-                        <Share2 className="w-5 h-5" />
-                        <span>Share Live Details</span>
-                      </div>
-                    </Button>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             </section>
           )}
@@ -306,6 +331,69 @@ const CheckRoute = () => {
 
         </main>
         <Footer />
+
+        {/* Incident Details Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="bg-brand-dark/95 backdrop-blur-xl border-white/10 text-white max-w-2xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+
+            <DialogHeader className="p-6 border-b border-white/10 bg-black/20 shrink-0">
+              <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                Safety Incidents
+              </DialogTitle>
+              <DialogDescription className="text-white/60">
+                Reported incidents along {selectedRoute?.route_name ? `"${selectedRoute.route_name.substring(0, 30)}..."` : 'the route'}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {incidents.length > 0 ? (
+                incidents.map((incident, idx) => (
+                  <div key={`${incident.id}-${idx}`} className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-colors">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-bold text-brand-teal">{incident.categories || 'Uncategorized Incident'}</h4>
+                      <span className="text-xs text-white/40 bg-white/5 px-2 py-1 rounded bg-black/20">{incident.incident_date}</span>
+                    </div>
+                    <p className="text-sm text-white/80 mb-3 leading-relaxed">{incident.description}</p>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs text-white/50">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3" />
+                        {incident.area}, {incident.city}
+                      </div>
+                      {(incident.time_from !== '00:00:00') && (
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3 h-3" />
+                          {incident.time_from}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                !loadingIncidents && <div className="text-center py-10 text-white/40">No details available for incidents on this route.</div>
+              )}
+
+              {loadingIncidents && (
+                <div className="flex justify-center py-6">
+                  <div className="w-6 h-6 border-2 border-brand-teal border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+
+              {!loadingIncidents && selectedRoute && selectedRoute.incident_ids && displayedIncidentCount < selectedRoute.incident_ids.length && (
+                <Button
+                  variant="outline"
+                  className="w-full border-white/10 hover:bg-white/5 text-white"
+                  onClick={() => selectedRoute && loadMoreIncidents(selectedRoute, displayedIncidentCount)}
+                >
+                  Load More Incidents
+                </Button>
+              )}
+            </div>
+
+          </DialogContent>
+        </Dialog>
+
       </div>
     </>
   );
