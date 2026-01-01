@@ -16,52 +16,53 @@ const Inspiration = lazy(() => import("./pages/Inspiration"));
 
 const queryClient = new QueryClient();
 
-const [isMobile, setIsMobile] = useState(false);
+const App = () => {
+  const [isMobile, setIsMobile] = useState(false);
 
-useEffect(() => {
-  const checkMobile = () => {
-    setIsMobile(window.innerWidth < 768);
-  };
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-  return () => window.removeEventListener('resize', checkMobile);
-}, []);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-const content = (
-  <TooltipProvider>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-      <ScrollToAnchor />
-      <Suspense fallback={
-        <div className="h-screen w-screen flex items-center justify-center bg-background">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      }>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/check-route" element={<CheckRoute />} />
-          <Route path="/inspiration" element={<Inspiration />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
-  </TooltipProvider>
-);
+  const content = (
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <ScrollToAnchor />
+        <Suspense fallback={
+          <div className="h-screen w-screen flex items-center justify-center bg-background">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/check-route" element={<CheckRoute />} />
+            <Route path="/inspiration" element={<Inspiration />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </TooltipProvider>
+  );
 
-return (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      {isMobile ? (
-        content
-      ) : (
-        <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothWheel: true }}>
-          {content}
-        </ReactLenis>
-      )}
-    </QueryClientProvider>
-  </HelmetProvider>
-);
-);
+  return (
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        {isMobile ? (
+          content
+        ) : (
+          <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothWheel: true }}>
+            {content}
+          </ReactLenis>
+        )}
+      </QueryClientProvider>
+    </HelmetProvider>
+  );
+};
 
 export default App;
