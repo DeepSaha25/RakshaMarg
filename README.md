@@ -44,21 +44,16 @@ We built RakshaMarg using a modern, scalable tech stack:
 *   **Vite**: For lightning-fast development and building.
 *   **Tailwind CSS + Shadcn UI**: For a sleek, accessible, and responsive design.
 *   **Three.js (@react-three/fiber)**: To create an immersive 3D map experience.
-
-### Backend 🔧
-*   **Node.js + Fastify**: High-performance API server.
 *   **Google Maps Platform**: The core engine for routing and geolocation.
-*   **Gemini AI**: Used to analyze urban data and calculate dynamic safety scores.
 
 ## 🧠 Challenges we ran into
 
 *   **Quantifying "Safety"**: Safety is subjective. Combining objective data (streetlights) with subjective feelings (isolation) into a single score was a complex algorithmic challenge.
 *   **3D Map Performance**: Rendering 3D elements on a map without lagging the browser required heavy optimization of our Three.js components.
-*   **Real-time Data**: syncing live location data with low latency for the "Guardian View" feature was tricky but essential.
 
 ## 🏆 Accomplishments that we're proud of
 
-*   Successfully integrating **AI-driven safety analysis** with standard routing.
+*   Successfully integrating **safety analysis** with standard routing.
 *   Building a **beautiful, dark-mode first UI** that feels premium and trustworthy.
 *   The **3D integration** on the landing page just looks cool!
 
@@ -71,7 +66,6 @@ We built RakshaMarg using a modern, scalable tech stack:
 ## 📦 quick Links
 
 *   [**Frontend Documentation**](./frontend/README.md) - Setup, and directory structure.
-*   [**Backend Documentation**](./backend/README.md) - API endpoints and server setup.
 
 ---
 
