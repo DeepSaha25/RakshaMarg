@@ -138,7 +138,7 @@ export default async function (fastify, opts) {
         onRequest: [fastify.verifyApiKey]
     }, async (request, reply) => {
         const { origin, destination } = request.query;
-
+        console.log(`[ROUTE DEBUG] Analyzing safety for: ${origin} -> ${destination}`);
         // 1. Fetch Routes from Google Maps
         const routes = await mapsService.getRoutes(origin, destination);
 
@@ -156,6 +156,7 @@ export default async function (fastify, opts) {
             let aiCrimeAnalysis = null;
 
             try {
+                console.log(`[ROUTE DEBUG] Calling Gemini for route: ${route.summary}`);
                 const geminiResult = await geminiService.analyzeSafety(route, crimeStats);
 
                 // Extract risk level from Gemini response

@@ -13,7 +13,9 @@ export async function buildApp() {
 
     // Global Plugins
     await app.register(cors, {
-        origin: true // Configure as needed for production
+        origin: '*', // Allow all origins for debugging
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
     });
 
     // Custom Plugins
