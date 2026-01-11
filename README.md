@@ -17,55 +17,112 @@
 
 <br />
 
-## 💡 Inspiration
+## Inspiration
 
-We've all been there—walking home late at night, clutching our phones, hyper-aware of every shadow. Most navigation apps tell you the *fastest* route, sending you down dark alleys or desolate streets just to save a minute.
+*   **The Problem**: Standard maps prioritize speed, often routing pedestrians through dark, unsafe alleys to save a minute.
+*   **The Gap**: Lack of navigation tools that account for personal safety, lighting, and crime data.
+*   **Our Solution**: RakshaMarg - "Navigation with a Conscience". We prioritize **Safety Corridors** (well-lit, populated) over pure distance.
 
-We asked ourselves: **Why isn't there a map that cares about your safety as much as your time?**
-
-That's why we built **RakshaMarg**. It's not just a navigation tool; it's a companion that guides you through the safest, most well-lit, and populated paths. Because arriving safely is more important than arriving early.
-
-## 🚀 What it does
+## What it does
 
 RakshaMarg is an intelligent safety-first navigation system.
 
-*   **🛡️ Safety Scores**: We analyze routes and assign a safety score (0-100) based on street lighting, crime data, and crowd density.
-*   **💡 Smart Routing**: Our algorithm prioritizes "Safety Corridors"—well-lit main roads and active areas—over shortcuts through unsafe zones.
-*   **📍 Live Tracking**: Share your real-time location with trusted contacts. They can watch over you virtually until you reach your destination.
-*   **🆘 SOS Button**: A single tap instantly alerts your emergency contacts with your precise location.
-*   **🏥 Safe Zones**: Automatically highlights nearby police stations, hospitals, and 24/7 open establishments along your route.
+*   **Safety Scores**: We analyze routes and assign a safety score (0-100) based on street lighting, crime data, and crowd density.
+*   **Smart Routing**: Our algorithm prioritizes "Safety Corridors"—well-lit main roads and active areas—over shortcuts through unsafe zones.
+*   **Live Tracking**: Share your real-time location with trusted contacts. They can watch over you virtually until you reach your destination.
+*   **SOS Button**: A single tap instantly alerts your emergency contacts with your precise location.
+*   **Safe Zones**: Automatically highlights nearby police stations, hospitals, and 24/7 open establishments along your route.
 
-## ⚙️ How we built it
+### User Safety Workflow
 
-We built RakshaMarg using a modern, scalable tech stack:
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as RakshaMarg App
+    participant System as Intelligent Backend
+    
+    User->>App: Enters Destination
+    App->>System: Request Routes
+    System->>System: Analyze Safety (lighting, crime, crowd)
+    System-->>App: Returns 3 Route Options (Safest Highlighted)
+    User->>App: Selects "Safety Corridor"
+    App->>User: Starts Navigation + Live Tracking
+    
+    opt Emergency Suspicion
+        User->>App: Hits SOS
+        App->>User: Alerts Contacts + Police
+    end
+```
 
-### Frontend 🎨
-*   **React + TypeScript**: For a robust and type-safe UI.
-*   **Vite**: For lightning-fast development and building.
-*   **Tailwind CSS + Shadcn UI**: For a sleek, accessible, and responsive design.
-*   **Three.js (@react-three/fiber)**: To create an immersive 3D map experience.
-*   **Google Maps Platform**: The core engine for routing and geolocation.
+## Potential Impact
 
-## 🧠 Challenges we ran into
+*   **Crime Prevention**: Proactively steering users away from high-risk zones reduces opportunity for incidents.
+*   **Public Safety**: Aggregating lighting/crime data helps authorities identify and fix "dark spots".
+*   **Peace of Mind**: Reducing anxiety for late-night commuters through trusted routing and SOS features.
+
+## Google Tech Used
+
+*   **Maps API**: Core interactive mapping interface.
+*   **Directions API**: Precision routing engine.
+*   **Gemini API**: AI-driven safety scoring & fallback logic.
+
+## Technical Implementation
+
+### System Architecture
+
+```mermaid
+graph TD
+    User[User] -->|Interacts| Frontend[React + Vite Frontend]
+    Frontend -->|API Calls| Backend[Node.js + Fastify Backend]
+    
+    subgraph Google Cloud Services
+        Backend -->|Routing Data| Maps[Google Maps Platform]
+        Backend -->|Risk Analysis| Gemini[Gemini AI]
+    end
+    
+    subgraph External Data
+        Backend -->|Incident Reports| SafeCity[Safecity API]
+    end
+    
+    Gemini -->|Safety Scores| Backend
+    Maps -->|Routes & traffic| Backend
+    Backend -->|Optimized Safe Path| Frontend
+```
+
+**Frontend (Robust & Interactive)**
+*   **React + TypeScript**: Type-safe, component-based UI.
+*   **Three.js**: High-performance 3D map rendering.
+*   **Vite**: Optimized build toolchain.
+
+**Backend (Scalable & fast)**
+*   **Node.js + Fastify**: Low-overhead, high-concurrency API handling.
+*   **Scalable Architecture**: Modular design separating routing, safety analysis, and user services.
+
+**Data & AI (The Intelligence)**
+*   **Google Maps Platform**: Enterprise-grade location data foundation.
+*   **Gemini AI**: Advanced reasoning for risk scoring (processing crime stats + environmental factors).
+
+## Challenges we ran into
 
 *   **Quantifying "Safety"**: Safety is subjective. Combining objective data (streetlights) with subjective feelings (isolation) into a single score was a complex algorithmic challenge.
 *   **3D Map Performance**: Rendering 3D elements on a map without lagging the browser required heavy optimization of our Three.js components.
 
-## 🏆 Accomplishments that we're proud of
+## Accomplishments that we're proud of
 
 *   Successfully integrating **safety analysis** with standard routing.
 *   Building a **beautiful, dark-mode first UI** that feels premium and trustworthy.
 *   The **3D integration** on the landing page just looks cool!
 
-## 🔮 What's next for RakshaMarg
+## What's next for RakshaMarg
 
 *   **Crowdsourced Safety**: allowing users to report broken streetlights or unsafe incidents in real-time.
 *   **WearOS Support**: A companion watch app for discreet vibration-based navigation.
 *   **Offline Mode**: Downloading safe routes for areas with poor connectivity.
 
-## 📦 quick Links
+## Quick Links
 
 *   [**Frontend Documentation**](./frontend/README.md) - Setup, and directory structure.
+*   [**Backend Documentation**](./src/README.md) - API endpoints and server setup.
 
 ---
 
